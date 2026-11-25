@@ -235,6 +235,9 @@ html[dir=rtl] select.fi{background-position:left 14px center}
 .badge.busy i{background:var(--warn)}
 .zoomtag{position:absolute;bottom:12px;inset-inline-end:12px;z-index:2;width:38px;height:38px;border-radius:50%;background:rgba(0,17,46,.7);color:#fff;display:grid;place-items:center;backdrop-filter:blur(6px);opacity:0;transform:scale(.7);transition:.3s var(--ease)}
 .zoomtag svg{width:18px;height:18px}
+.revbtn{position:absolute;bottom:12px;inset-inline-start:12px;z-index:3;width:40px;height:40px;border-radius:50%;border:0;background:rgba(0,102,240,.92);color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 6px 16px -6px rgba(0,0,0,.5);transition:transform .25s var(--ease)}
+.revbtn:hover{transform:scale(1.1)}.revbtn:active{transform:scale(.92)}
+.revbtn svg{width:19px;height:19px}
 .card:hover .zoomtag{opacity:1;transform:none}
 @media(hover:none){.zoomtag{opacity:1;transform:none}}
 .card .body{padding:20px;display:flex;flex-direction:column;gap:12px;flex:1}
@@ -328,9 +331,9 @@ html[dir=rtl] select.fi{background-position:left 14px center}
 .sum .pp{aspect-ratio:16/9;background:#0A2350}
 .sum .pp img{width:100%;height:100%;object-fit:cover}
 .sum .in2{padding:22px;display:grid;gap:10px}
-.line{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:15px}
-.line span{color:var(--mute)}
-.line b{text-align:end}
+.sline{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:15px}
+.sline span{color:var(--mute)}
+.sline b{text-align:end}
 .note{font-size:13.5px;color:#FDE68A;background:rgba(217,119,6,.12);border:1px solid rgba(217,119,6,.35);border-radius:12px;padding:10px 12px}
 .check{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:#33415C;cursor:pointer}
 .check input{width:20px;height:20px;accent-color:var(--blue);flex:none;margin-top:3px}
@@ -584,7 +587,7 @@ fExplore:'Explore',fHelp:'Help',fContact:'Contact',footAbout:'Premium car rental
 rights:'All rights reserved',madeFor:'Rent a car · Afghanistan',
 soundOn:'Sound on',soundOff:'Sound off',langSet:'English selected',
 sampleNote:'Availability shown is set by Noori Drive and is confirmed for your dates on WhatsApp.',
-vHint:'Pinch or double-tap to zoom · drag to look around · swipe for next car',
+vHint:'Pinch or double-tap to zoom · drag to look around · swipe for next car',listen:'Hear the engine',
 mTSaved:'Request received',mPSaved:'Your request has been saved and our team will contact you to confirm availability and price. Your booking is not confirmed yet. For a faster reply, you can also send it on WhatsApp.',
 adminT:'Admin',adminH:'Admin panel',email:'Email',password:'Password',login:'Log in',logout:'Log out',loginErr:'Wrong email or password.',notAdmin:'This account does not have admin access.',noSb:'Cannot reach the database. Check your internet and try again.',
 tBookings:'Bookings',tCars:'Cars',st_new:'New',st_confirmed:'Confirmed',st_completed:'Completed',st_cancelled:'Cancelled',stAll:'All',noBk:'No booking requests yet.',refresh:'Refresh',del:'Delete',delQ:'Delete this permanently? This cannot be undone.',yesDel:'Yes, delete',cancel:'Cancel',edit:'Edit',
@@ -651,7 +654,7 @@ fExplore:'گشت و گذار',fHelp:'کمک',fContact:'تماس',footAbout:'کر
 rights:'تمام حقوق محفوظ است',madeFor:'کرایهٔ موتر · افغانستان',
 soundOn:'صدا روشن',soundOff:'صدا خاموش',langSet:'زبان دری انتخاب شد',
 sampleNote:'موجودیت نشان‌داده‌شده توسط نوری درایو تنظیم می‌شود و برای تاریخ‌های شما در واتساپ تایید می‌گردد.',
-vHint:'با دو انگشت یا دو بار لمس زوم کنید · بکشید تا همه جا را ببینید · برای موتر بعدی ورق بزنید',
+vHint:'با دو انگشت یا دو بار لمس زوم کنید · بکشید تا همه جا را ببینید · برای موتر بعدی ورق بزنید',listen:'صدای انجن',
 mTSaved:'درخواست شما رسید',mPSaved:'درخواست شما ثبت شد و تیم ما برای تایید موجودیت و قیمت با شما تماس می‌گیرد. بُکینگ شما هنوز تایید نشده است. برای جواب سریع‌تر می‌توانید آن را در واتساپ هم بفرستید.',
 adminT:'ادمین',adminH:'پنل مدیریت',email:'ایمیل',password:'رمز عبور',login:'ورود',logout:'خروج',loginErr:'ایمیل یا رمز عبور اشتباه است.',notAdmin:'این حساب اجازهٔ مدیریت ندارد.',noSb:'به دیتابیس وصل نشد. انترنت را بررسی کنید و دوباره کوشش کنید.',
 tBookings:'بُکینگ‌ها',tCars:'موترها',st_new:'نو',st_confirmed:'تایید شده',st_completed:'تمام شده',st_cancelled:'لغو شده',stAll:'همه',noBk:'هنوز درخواست بُکینگ نیامده است.',refresh:'تازه کردن',del:'حذف',delQ:'این برای همیشه حذف شود؟ دوباره برنمی‌گردد.',yesDel:'بلی، حذف شود',cancel:'لغو',edit:'ویرایش',
@@ -683,23 +686,70 @@ const waURL=txt=>'https://wa.me/'+WA+(txt?'?text='+encodeURIComponent(txt):'');
 const words=s=>s.split(' ').map(w=>`<span class="w"><span>${w}</span></span>`).join(' ');
 
 /* ======= SOUND (Web Audio, no files) ======= */
-const SFX={ctx:null,out:null,last:0,unlocked:false,
- ac(){if(!S.sound)return null;try{if(!this.ctx){this.ctx=new (window.AudioContext||window.webkitAudioContext)();const comp=this.ctx.createDynamicsCompressor();comp.threshold.value=-18;comp.ratio.value=4;this.out=this.ctx.createGain();this.out.gain.value=1;this.out.connect(comp).connect(this.ctx.destination)}if(this.ctx.state!=='running')this.ctx.resume();return this.ctx}catch(e){return null}},
- unlock(){const c=this.ac();if(!c||this.unlocked)return;try{const b=c.createBuffer(1,1,22050),s=c.createBufferSource();s.buffer=b;s.connect(c.destination);s.start(0);this.unlocked=true}catch(e){}},
- tone(f1,f2,dur,type='sine',vol=.2,delay=0){const c=this.ac();if(!c)return;const o=c.createOscillator(),g=c.createGain(),t0=c.currentTime+.01+delay;o.type=type;o.frequency.setValueAtTime(f1,t0);o.frequency.exponentialRampToValueAtTime(f2,t0+dur);g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(vol,t0+.006);g.gain.exponentialRampToValueAtTime(.0001,t0+dur);o.connect(g).connect(this.out);o.start(t0);o.stop(t0+dur+.03)},
- noise(dur,f1,f2,vol=.2){const c=this.ac();if(!c)return;const n=Math.floor(c.sampleRate*dur),b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;const s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain(),t0=c.currentTime+.01;s.buffer=b;f.type='bandpass';f.Q.value=1.4;f.frequency.setValueAtTime(f1,t0);f.frequency.exponentialRampToValueAtTime(f2,t0+dur);g.gain.setValueAtTime(vol,t0);g.gain.exponentialRampToValueAtTime(.0001,t0+dur);s.connect(f).connect(g).connect(this.out);s.start(t0)},
- click(){this.tone(1400,700,.07,'triangle',.35);this.noise(.04,3200,1800,.15)},
- hover(){const n=performance.now();if(n-this.last<80||!this.ctx)return;this.last=n;this.tone(2200,2000,.03,'sine',.06)},
- nav(){this.noise(.35,500,3200,.3);this.tone(500,1000,.2,'triangle',.15)},
- swipe(){this.noise(.25,2400,700,.25)},
- toggle(){this.tone(880,880,.07,'triangle',.3);this.tone(1320,1320,.08,'triangle',.25,.06)},
- ok(){[660,880,1320].forEach((f,i)=>this.tone(f,f,.25,'triangle',.3,i*.1))},
- err(){this.tone(320,220,.18,'square',.12);this.tone(280,190,.18,'square',.1,.13)},
- engine(){const c=this.ac();if(!c)return;const t0=c.currentTime+.01,g=c.createGain(),f=c.createBiquadFilter();f.type='lowpass';f.frequency.setValueAtTime(900,t0);f.frequency.linearRampToValueAtTime(2200,t0+.45);f.frequency.linearRampToValueAtTime(800,t0+1);
-  g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(.32,t0+.08);g.gain.setValueAtTime(.32,t0+.5);g.gain.exponentialRampToValueAtTime(.0001,t0+1.05);f.connect(g).connect(this.out);
-  [[1,'sawtooth',.6],[2,'square',.25],[3,'sawtooth',.2]].forEach(([m,type,v])=>{const o=c.createOscillator(),og=c.createGain();o.type=type;o.frequency.setValueAtTime(70*m,t0);o.frequency.exponentialRampToValueAtTime(180*m,t0+.45);o.frequency.exponentialRampToValueAtTime(110*m,t0+1);og.gain.value=v;o.connect(og).connect(f);o.start(t0);o.stop(t0+1.1)});
-  this.noise(.5,800,2500,.12)}};
+/* Premium UI sound design: soft wooden taps, glass chimes, airy whooshes, shared room reverb */
+const SFX={ctx:null,dry:null,wet:null,last:0,unlocked:false,
+ ac(){if(!S.sound)return null;try{if(!this.ctx){const c=this.ctx=new (window.AudioContext||window.webkitAudioContext)();
+   const comp=c.createDynamicsCompressor();comp.threshold.value=-14;comp.knee.value=12;comp.ratio.value=3;comp.attack.value=.003;comp.release.value=.15;
+   const master=c.createGain();master.gain.value=.9;master.connect(comp).connect(c.destination);
+   const rev=c.createConvolver(),len=Math.floor(c.sampleRate*1.6),ir=c.createBuffer(2,len,c.sampleRate);
+   for(let ch=0;ch<2;ch++){const d=ir.getChannelData(ch);for(let i=0;i<len;i++){const t=i/len;d[i]=(Math.random()*2-1)*Math.pow(1-t,3.2)*(i<c.sampleRate*.012?0:1)}}
+   rev.buffer=ir;const hp=c.createBiquadFilter();hp.type='highpass';hp.frequency.value=350;const wetG=c.createGain();wetG.gain.value=.22;
+   this.wet=c.createGain();this.wet.connect(hp).connect(rev).connect(wetG).connect(master);this.dry=c.createGain();this.dry.connect(master)}
+  if(this.ctx.state!=='running')this.ctx.resume();return this.ctx}catch(e){return null}},
+ unlock(){const c=this.ac();if(!c||this.unlocked)return;try{const s=c.createBufferSource();s.buffer=c.createBuffer(1,1,22050);s.connect(c.destination);s.start(0);this.unlocked=true}catch(e){}},
+ bus(node,wet=.5){node.connect(this.dry);if(wet>0){const g=this.ctx.createGain();g.gain.value=wet;node.connect(g).connect(this.wet)}},
+ env(g,t0,a,peak,dec){g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(peak,t0+a);g.gain.exponentialRampToValueAtTime(.0001,t0+a+dec)},
+ partial(freq,t0,peak,dec,type='sine',wet=.5,bend=1){const c=this.ctx,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(freq,t0);if(bend!==1)o.frequency.exponentialRampToValueAtTime(freq*bend,t0+Math.min(dec,.08));this.env(g,t0,.002,peak,dec);o.connect(g);this.bus(g,wet);o.start(t0);o.stop(t0+dec+.05)},
+ air(t0,dur,f1,f2,peak,q=.8,wet=.6,attack=.08){const c=this.ctx,n=Math.floor(c.sampleRate*(dur+.05)),b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);let l=0;for(let i=0;i<n;i++){const w=Math.random()*2-1;l=.97*l+.03*w;d[i]=(w*.4+l*3)}
+  const s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();s.buffer=b;f.type='bandpass';f.Q.value=q;f.frequency.setValueAtTime(f1,t0);f.frequency.exponentialRampToValueAtTime(f2,t0+dur);
+  g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(peak,t0+attack);g.gain.exponentialRampToValueAtTime(.0001,t0+dur);s.connect(f).connect(g);this.bus(g,wet);s.start(t0);s.stop(t0+dur+.05)},
+ tick(t0,freq,vol){this.partial(freq,t0,vol,.045,'sine',.25,.82);this.partial(freq*2.03,t0,vol*.35,.025,'sine',.15);this.air(t0,.018,5000,3500,vol*.5,2,.1,.001)},
+ now(){const c=this.ac();return c?c.currentTime+.015:null},
+ click(){const t=this.now();if(t==null)return;this.tick(t,1250,.22)},
+ hover(){const n=performance.now();if(n-this.last<120||!this.ctx)return;this.last=n;const t=this.now();if(t==null)return;this.partial(2600,t,.025,.03,'sine',.2)},
+ toggle(){const t=this.now();if(t==null)return;this.tick(t,1100,.2);this.tick(t+.07,1480,.17)},
+ nav(){const t=this.now();if(t==null)return;this.air(t,.42,380,2600,.16,.7,.7,.16);this.partial(1318.5,t+.2,.05,.5,'sine',.9)},
+ swipe(){const t=this.now();if(t==null)return;this.air(t,.28,2200,600,.14,.9,.5,.04)},
+ bell(t,f,vol,dec){[[1,1],[2.01,.42],[3.0,.2],[4.23,.09]].forEach(([m,a])=>this.partial(f*m,t,vol*a,dec/(m*.6+.4),'sine',.8))},
+ ok(){const t=this.now();if(t==null)return;this.bell(t,1046.5,.16,1.3);this.bell(t+.11,1318.5,.15,1.4);this.bell(t+.22,1568,.15,1.8)},
+ err(){const t=this.now();if(t==null)return;this.partial(392,t,.2,.14,'triangle',.3,.9);this.partial(311,t+.12,.2,.2,'triangle',.3,.9)},
+ engine(){const t=this.now();if(t==null)return;this.air(t,.55,300,1800,.18,.6,.7,.3);this.partial(196,t,.0001,.01);this.bell(t+.32,784,.14,1.2);this.bell(t+.32,1174.7,.11,1.5)}};
 ['touchstart','pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,()=>SFX.unlock(),{passive:true,capture:true}));
+/* Per-car engine & exhaust synthesis: firing-pulse oscillators + muffler resonance + combustion noise */
+const ENG={landcruiser:{cyl:8,idle:650,peak:4300,muff:780,sub:.55,grit:.5,turbo:.05,vol:1},
+ mercedes:{cyl:8,idle:620,peak:4600,muff:950,sub:.35,grit:.25,turbo:0,vol:.9},
+ lexus:{cyl:6,idle:700,peak:5200,muff:1250,sub:.12,grit:.15,turbo:0,vol:.8},
+ crown:{cyl:6,idle:680,peak:5000,muff:1150,sub:.15,grit:.2,turbo:0,vol:.85},
+ fortuner:{cyl:4,idle:760,peak:3700,muff:1050,sub:.2,grit:.9,turbo:.08,vol:.95,diesel:1},
+ corolla:{cyl:4,idle:800,peak:5200,muff:1500,sub:.08,grit:.25,turbo:0,vol:.75},
+ prius:{cyl:4,idle:1000,peak:3800,muff:1600,sub:0,grit:.1,turbo:0,vol:.45,ev:1}};
+const engFor=c=>ENG[c.id]||({suv:ENG.landcruiser,luxury:ENG.lexus,hybrid:ENG.prius}[c.cat])||ENG.corolla;
+let revBusy=0;
+SFX.rev=function(id){const c=this.ac();if(!c)return;const now=performance.now();if(now-revBusy<2600)return;revBusy=now;
+ const cr=car(id)||{id,cat:'sedan'},P=engFor(cr),t=c.currentTime+.03,T=3.1,ff=r=>r/60*P.cyl/2;
+ const out=c.createGain();out.gain.setValueAtTime(0,t);out.gain.linearRampToValueAtTime(.55*P.vol,t+.4);out.gain.setValueAtTime(.55*P.vol,t+T-.7);out.gain.exponentialRampToValueAtTime(.0001,t+T);this.bus(out,.18);
+ const muff=c.createBiquadFilter();muff.type='lowpass';muff.Q.value=4;
+ const shaper=c.createWaveShaper(),k=2+P.grit*28,curve=new Float32Array(1024);for(let i=0;i<1024;i++){const x=i/512-1;curve[i]=(1+k)*x/(1+k*Math.abs(x))}shaper.curve=curve;
+ shaper.connect(muff).connect(out);
+ const rpm=(param,mul)=>{const a=P.idle,pk=P.peak;param.setValueAtTime(ff(a*.25)*mul,t);param.linearRampToValueAtTime(ff(a*.3)*mul,t+.35);param.exponentialRampToValueAtTime(ff(a*1.9)*mul,t+.55);param.exponentialRampToValueAtTime(ff(a)*mul,t+1.0);param.setValueAtTime(ff(a)*mul,t+1.15);param.exponentialRampToValueAtTime(ff(pk)*mul,t+1.65);param.exponentialRampToValueAtTime(ff(a*1.05)*mul,t+2.45);param.setValueAtTime(ff(a*1.05)*mul,t+T)};
+ // muffler opens with rpm
+ muff.frequency.setValueAtTime(P.muff*.5,t);muff.frequency.exponentialRampToValueAtTime(P.muff,t+.55);muff.frequency.setValueAtTime(P.muff*.8,t+1.15);muff.frequency.exponentialRampToValueAtTime(P.muff*2.4,t+1.65);muff.frequency.exponentialRampToValueAtTime(P.muff*.85,t+2.45);
+ // combustion pulse spectrum
+ const N=24,re=new Float32Array(N),im=new Float32Array(N);for(let h=1;h<N;h++){im[h]=(1/h)*(h%2?1:.6)*(P.diesel&&h>6?1.4:1)}const wave=c.createPeriodicWave(re,im);
+ const mk=(mul,gain,type)=>{const o=c.createOscillator(),g=c.createGain();if(type)o.type=type;else o.setPeriodicWave(wave);rpm(o.frequency,mul);g.gain.value=gain;o.connect(g).connect(shaper);o.start(t+.3);o.stop(t+T+.05);return o};
+ if(P.ev){const w=c.createOscillator(),wg=c.createGain();w.type='sine';w.frequency.setValueAtTime(180,t);w.frequency.exponentialRampToValueAtTime(900,t+1.6);w.frequency.exponentialRampToValueAtTime(260,t+2.6);wg.gain.setValueAtTime(0,t);wg.gain.linearRampToValueAtTime(.18,t+.3);wg.gain.exponentialRampToValueAtTime(.0001,t+T);w.connect(wg);this.bus(wg,.3);w.start(t);w.stop(t+T+.05)}
+ mk(1,.5);mk(1.003,.25);if(P.sub)mk(.5,P.sub);mk(2,.12,'triangle');
+ // burble: amplitude wobble for V8 crossplane feel
+ if(P.cyl===8){const lfo=c.createOscillator(),lg=c.createGain();lfo.type='square';rpm(lfo.frequency,.25);lg.gain.value=.18;lfo.connect(lg).connect(out.gain);lfo.start(t+.3);lfo.stop(t+T)}
+ // combustion / intake noise following rpm
+ const n=Math.floor(c.sampleRate*(T+.1)),nb=c.createBuffer(1,n,c.sampleRate),nd=nb.getChannelData(0);for(let i=0;i<n;i++)nd[i]=Math.random()*2-1;
+ const ns=c.createBufferSource(),nf=c.createBiquadFilter(),ng=c.createGain();ns.buffer=nb;nf.type='bandpass';nf.Q.value=1.2;nf.frequency.setValueAtTime(400,t);nf.frequency.exponentialRampToValueAtTime(1600,t+1.65);nf.frequency.exponentialRampToValueAtTime(500,t+2.45);
+ ng.gain.value=.05+P.grit*.12;ns.connect(nf).connect(ng).connect(shaper);ns.start(t);
+ // starter motor whirr
+ const st=c.createOscillator(),sg=c.createGain(),sf=c.createBiquadFilter();st.type='sawtooth';st.frequency.setValueAtTime(14,t);st.frequency.linearRampToValueAtTime(18,t+.35);sf.type='bandpass';sf.frequency.value=900;sf.Q.value=2;sg.gain.setValueAtTime(.0001,t);sg.gain.linearRampToValueAtTime(P.ev?.02:.35,t+.04);sg.gain.exponentialRampToValueAtTime(.0001,t+.42);st.connect(sf).connect(sg);this.bus(sg,.1);st.start(t);st.stop(t+.45);
+ if(P.turbo){const tb=c.createOscillator(),tg=c.createGain();tb.type='sine';tb.frequency.setValueAtTime(2500,t+1.1);tb.frequency.exponentialRampToValueAtTime(6500,t+1.7);tb.frequency.exponentialRampToValueAtTime(3000,t+2.5);tg.gain.setValueAtTime(0,t+1.1);tg.gain.linearRampToValueAtTime(P.turbo,t+1.6);tg.gain.exponentialRampToValueAtTime(.0001,t+2.6);tb.connect(tg);this.bus(tg,.3);tb.start(t+1.1);tb.stop(t+2.7)}
+};
+
 
 /* ======= ICONS ======= */
 const IC={seat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 4v9a2 2 0 0 0 2 2h7l2 5M7 13h9"/><path d="M9 20h8"/></svg>',
@@ -725,7 +775,7 @@ cal:'<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="5" wid
 check:'<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><path d="M5 12l5 5 9-10"/></svg>'};
 const badge=c=>`<span class="badge ${c.status==='available'?'':'busy'}"><i></i>${t(c.status==='available'?'available':'booked')}</span>`;
 const specChips=c=>`<div class="specs"><span>${IC.seat}${faD(c.seats)} ${t('seats')}</span><span>${IC.bag}${faD(c.bags)} ${t('bags')}</span><span>${IC.gear}${t('auto')}</span><span>${IC.fuel}${t(c.fuel)}</span></div>`;
-const cardHTML=c=>`<article class="card rv" data-tilt><div class="pic" data-view="${c.id}" role="button" tabindex="0" aria-label="${esc(L(c.name))}">${badge(c)}${img(c)}<span class="zoomtag">${IC.zoom}</span></div><div class="body"><div><h3>${esc(L(c.name))}</h3><div class="cls">${esc(L(c.cls))}</div></div><p>${esc(L(c.desc))}</p>${specChips(c)}<div class="foot"><div class="price">${priceHTML(c)}</div><div class="acts"><a class="btn line sm" href="#car-${c.id}">${t('details')}</a><a class="btn sm" href="#booking" data-book="${c.id}" data-engine>${t('book')}</a></div></div></div></article>`;
+const cardHTML=c=>`<article class="card rv" data-tilt><div class="pic" data-view="${c.id}" role="button" tabindex="0" aria-label="${esc(L(c.name))}">${badge(c)}${img(c)}<span class="zoomtag">${IC.zoom}</span><button type="button" class="revbtn" data-rev="${c.id}" aria-label="${t('listen')}">${IC.sOn}</button></div><div class="body"><div><h3>${esc(L(c.name))}</h3><div class="cls">${esc(L(c.cls))}</div></div><p>${esc(L(c.desc))}</p>${specChips(c)}<div class="foot"><div class="price">${priceHTML(c)}</div><div class="acts"><a class="btn line sm" href="#car-${c.id}">${t('details')}</a><a class="btn sm" href="#booking" data-book="${c.id}" data-engine>${t('book')}</a></div></div></div></article>`;
 const speed=n=>Array.from({length:n},(_,i)=>`<i style="top:${(i*37)%96+2}%;width:${80+(i*53)%220}px;animation-duration:${2.6+(i*7)%40/10}s;animation-delay:${(i*0.73)%4}s"></i>`).join('');
 
 /* ======= VIEWS ======= */
@@ -743,7 +793,7 @@ V.home=()=>{const hc=CARS[S.hero];return `
    <div class="track" id="track" dir="ltr">${CARS.map((c,i)=>`<div class="sl ${i===S.hero?'on':''}" data-view="${c.id}" data-i="${i}">${img(c)}</div>`).join('')}</div>
    <button class="nav prev" type="button" data-dk="-1" aria-label="Previous">${IC.left}</button><button class="nav next" type="button" data-dk="1" aria-label="Next">${IC.right}</button>
    <div class="deckbar"><div class="dname" id="dname"><b>${esc(L(hc.name))}</b><span>${esc(L(hc.cls))}</span></div><div class="dots" id="dots" dir="ltr">${CARS.map((c,i)=>`<button type="button" data-dot="${i}" aria-label="${esc(L(c.name))}" class="${i===S.hero?'on':''}"></button>`).join('')}</div></div>
-   <span class="hint">${IC.hand}${t('swipeHint')}</span>
+   <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between"><span class="hint">${IC.hand}${t('swipeHint')}</span><button type="button" class="btn line sm" id="heroRev">${IC.sOn} ${t('listen')}</button></div>
   </div>
  </div>
  ${qbar()}
@@ -792,7 +842,7 @@ V.car=id=>{const c=car(id);if(!c)return V.fleet();return `
  <aside class="panel rv"><div class="cls" style="color:var(--blue);font-weight:800">${esc(L(c.cls))}</div><h1>${esc(L(c.name))}</h1>
   <div class="sgrid"><div><small>${t('seatsL')}</small><b>${faD(c.seats)}</b></div><div><small>${t('bagsL')}</small><b>${faD(c.bags)}</b></div><div><small>${t('gear')}</small><b>${t('auto')}</b></div><div><small>${t('fuel')}</small><b>${t(c.fuel)}</b></div><div><small>${t('drive')}</small><b class="ltr">${c.drive}</b></div><div><small>${t('status')}</small><b style="color:${c.status==='available'?'var(--ok)':'var(--warn)'}">${t(c.status==='available'?'available':'booked')}</b></div></div>
   <div class="ratebox"><div class="price">${priceHTML(c)}</div>${c.rate?'':`<span style="font-size:13px;color:#A9B8D0">${t('totalReq')}</span>`}</div>
-  <div class="stack-btn"><a class="btn" href="#booking" data-book="${c.id}" data-engine>${t('bookNow')} ${IC.arrow}</a><a class="btn wa" target="_blank" rel="noopener" href="${waURL((S.lang==='fa'?'سلام، دربارهٔ این موتر معلومات می‌خواهم: ':'Hello, I would like information about: ')+c.name.en)}">${IC.wa} ${t('waBook')}</a></div>
+  <div class="stack-btn"><button type="button" class="btn line" data-rev="${c.id}">${IC.sOn} ${t('listen')}</button><a class="btn" href="#booking" data-book="${c.id}" data-engine>${t('bookNow')} ${IC.arrow}</a><a class="btn wa" target="_blank" rel="noopener" href="${waURL((S.lang==='fa'?'سلام، دربارهٔ این موتر معلومات می‌خواهم: ':'Hello, I would like information about: ')+c.name.en)}">${IC.wa} ${t('waBook')}</a></div>
   <p style="color:var(--mute);font-size:13px;margin:14px 0 0">${t('specNote')}</p></aside></div>
  <div class="head" style="margin-top:80px"><h2 class="words rv">${words(t('related'))}</h2><a class="btn line rv" href="#fleet">${t('back')}</a></div>
  <div class="grid">${CARS.filter(x=>x.id!==c.id&&x.cat===c.cat).concat(CARS.filter(x=>x.id!==c.id)).filter((x,i,a)=>a.indexOf(x)===i).slice(0,3).map(cardHTML).join('')}</div></div></section>`};
@@ -818,11 +868,11 @@ V.booking=()=>{const b=S.bk;return `${pageHero(t('bkT'),t('bkP'))}<section class
 <aside class="sum rv" id="sum"></aside></div></div></section>`};
 const fillSum=()=>{const el=$('#sum');if(!el)return;const b=S.bk,c=car(b.car),n=Math.max(days(),0);
  el.innerHTML=`<div class="pp">${c?img(c):''}</div><div class="in2"><h3>${t('summary')}</h3>
- <div class="line"><span>${t('vehicle')}</span><b>${c?esc(L(c.name)):'—'}</b></div><div class="line"><span>${t('type')}</span><b>${t(b.type==='driver'?'driver':'self')}</b></div>
- <div class="line"><span>${t('pickup')}</span><b>${fmtDate(b.from)}</b></div><div class="line"><span>${t('ret')}</span><b>${fmtDate(b.to)}</b></div>
- <div class="line"><span>${t('duration')}</span><b>${faD(n)} ${t('days')}</b></div>
- <div class="line"><span>${t('rateLabel')}</span><b>${c&&c.rate?money(c.rate):t('onRequest')}</b></div>
- <div class="line" style="border:0"><span>${t('total')}</span><b style="font-family:var(--fh);font-size:19px">${c&&c.rate&&n>0?money(c.rate*n):t('totalReq')}</b></div>
+ <div class="sline"><span>${t('vehicle')}</span><b>${c?esc(L(c.name)):'—'}</b></div><div class="sline"><span>${t('type')}</span><b>${t(b.type==='driver'?'driver':'self')}</b></div>
+ <div class="sline"><span>${t('pickup')}</span><b>${fmtDate(b.from)}</b></div><div class="sline"><span>${t('ret')}</span><b>${fmtDate(b.to)}</b></div>
+ <div class="sline"><span>${t('duration')}</span><b>${faD(n)} ${t('days')}</b></div>
+ <div class="sline"><span>${t('rateLabel')}</span><b>${c&&c.rate?money(c.rate):t('onRequest')}</b></div>
+ <div class="sline" style="border:0"><span>${t('total')}</span><b style="font-family:var(--fh);font-size:19px">${c&&c.rate&&n>0?money(c.rate*n):t('totalReq')}</b></div>
  <div class="note">${t('reqNote')}</div></div>`};
 
 V.about=()=>`${pageHero(t('aboutT'),'')}<section class="band"><div class="wrap"><div class="about">
@@ -872,10 +922,10 @@ function aBookings(){const list=A.bk.filter(x=>A.filter==='all'||x.status===A.fi
   return `<article class="card" style="padding:18px;gap:10px;display:grid;align-content:start${b.status==='new'?';border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,102,240,.12)':''}">
   <div style="display:flex;justify-content:space-between;gap:10px;align-items:start"><div><h3 style="font-size:18px">${esc(b.name)}</h3><a class="ltr" style="color:var(--blue);font-weight:700" href="tel:${esc(ph)}">${esc(b.phone)}</a></div>
   <select class="fi" style="width:auto;min-height:40px;font-size:14px" data-a="status" data-id="${esc(b.id)}">${ST.map(s=>`<option value="${s}" ${b.status===s?'selected':''}>${t('st_'+s)}</option>`).join('')}</select></div>
-  <div class="line"><span>${t('vehicle')}</span><b>${esc(b.car_name||b.car_id||'—')}</b></div>
-  <div class="line"><span>${t('pickup')} → ${t('ret')}</span><b class="ltr">${esc(b.pickup||'')} → ${esc(b.return_date||'')}</b></div>
-  <div class="line"><span>${t('duration')}</span><b>${faD(b.days??'')} ${t('days')} · ${t(b.rental_type==='driver'?'driver':'self')}</b></div>
-  ${b.location?`<div class="line"><span>${t('location')}</span><b>${esc(b.location)}</b></div>`:''}
+  <div class="sline"><span>${t('vehicle')}</span><b>${esc(b.car_name||b.car_id||'—')}</b></div>
+  <div class="sline"><span>${t('pickup')} → ${t('ret')}</span><b class="ltr">${esc(b.pickup||'')} → ${esc(b.return_date||'')}</b></div>
+  <div class="sline"><span>${t('duration')}</span><b>${faD(b.days??'')} ${t('days')} · ${t(b.rental_type==='driver'?'driver':'self')}</b></div>
+  ${b.location?`<div class="sline"><span>${t('location')}</span><b>${esc(b.location)}</b></div>`:''}
   ${b.notes?`<p style="margin:0;background:var(--soft);border-radius:10px;padding:10px;font-size:14px">${esc(b.notes)}</p>`:''}
   <small style="color:var(--mute)">${t('received')}: ${esc(aDate(b.created_at))}</small>
   <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn wa sm" target="_blank" rel="noopener" href="https://wa.me/${esc(wa)}?text=${encodeURIComponent(msg)}">${IC.wa} WhatsApp</a><a class="btn navy sm" href="tel:${esc(ph)}">${IC.phone}</a><button class="btn line sm" type="button" data-a="delbk" data-id="${esc(b.id)}" style="color:#DC2626">${t('del')}</button></div></article>`}).join('')}</div>`}
@@ -933,7 +983,7 @@ function render(anim){const r=parse();const app=$('#app');const go=()=>{app.inne
   if(r.v==='fleet')fillFleet();if(r.v==='booking')fillSum();
   $$('#nav a,#dnav a').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+(r.v==='car'?'fleet':r.v)));
   document.title=(r.v==='car'?L(car(r.arg)?.name||{en:''}):t(r.v))+' — NOORI DRIVE';
-  app.classList.remove('out');reveal();initDeck()};
+  app.classList.remove('out');reveal();initDeck();if(r.v==='car'&&anim)setTimeout(()=>SFX.rev(r.arg),450)};
  if(anim){app.classList.add('out');const w=$('#wipe');w.classList.remove('go');void w.offsetWidth;w.classList.add('go');setTimeout(()=>{go();window.scrollTo({top:0,behavior:'instant'})},360)}else go();cur=location.hash}
 function chrome(){const h=document.documentElement;h.lang=S.lang;h.dir=S.lang==='fa'?'rtl':'ltr';
  $('#nav').innerHTML=NAV.map(k=>`<a href="#${k}">${t(k)}</a>`).join('');
@@ -1019,6 +1069,8 @@ function showReq(msg,saved){SFX.ok();openModal(`<div class="okring">${IC.check}<
 document.addEventListener('click',e=>{
  const a=e.target.closest('a,button,summary,.chip,label.check,[data-view]');
  if(a&&!a.closest('#vstage')){if(a.matches('[data-engine]'))SFX.engine();else if(a.matches('a[href^="#"]'))SFX.nav();else if(!a.matches('[data-view]'))SFX.click()}
+ const rv=e.target.closest('[data-rev]');if(rv){e.stopPropagation();SFX.rev(rv.dataset.rev);return}
+ if(e.target.closest('#heroRev')){SFX.rev(CARS[S.hero].id);return}
  const vw=e.target.closest('[data-view]');if(vw&&!e.target.closest('a,.badge')){vOpen(vw.dataset.view);return}
  const bk=e.target.closest('[data-book]');if(bk){S.bk.car=bk.dataset.book;saveBk()}
  const lb=e.target.closest('.lang button');if(lb&&lb.dataset.l!==S.lang){S.lang=lb.dataset.l;store.set('lang',S.lang);chrome();render(false);toast(t('langSet'));SFX.toggle()}
