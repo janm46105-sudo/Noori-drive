@@ -683,18 +683,23 @@ const waURL=txt=>'https://wa.me/'+WA+(txt?'?text='+encodeURIComponent(txt):'');
 const words=s=>s.split(' ').map(w=>`<span class="w"><span>${w}</span></span>`).join(' ');
 
 /* ======= SOUND (Web Audio, no files) ======= */
-const SFX={ctx:null,last:0,
- ac(){if(!S.sound)return null;try{if(!this.ctx)this.ctx=new (window.AudioContext||window.webkitAudioContext)();if(this.ctx.state==='suspended')this.ctx.resume();return this.ctx}catch(e){return null}},
- tone(f1,f2,dur,type='sine',vol=.06,delay=0){const c=this.ac();if(!c)return;const o=c.createOscillator(),g=c.createGain(),t0=c.currentTime+delay;o.type=type;o.frequency.setValueAtTime(f1,t0);o.frequency.exponentialRampToValueAtTime(f2,t0+dur);g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(vol,t0+.008);g.gain.exponentialRampToValueAtTime(.0001,t0+dur);o.connect(g).connect(c.destination);o.start(t0);o.stop(t0+dur+.02)},
- noise(dur,f1,f2,vol=.05){const c=this.ac();if(!c)return;const n=c.sampleRate*dur,b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;const s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain(),t0=c.currentTime;s.buffer=b;f.type='bandpass';f.Q.value=1.2;f.frequency.setValueAtTime(f1,t0);f.frequency.exponentialRampToValueAtTime(f2,t0+dur);g.gain.setValueAtTime(vol,t0);g.gain.exponentialRampToValueAtTime(.0001,t0+dur);s.connect(f).connect(g).connect(c.destination);s.start()},
- click(){this.tone(1900,900,.05,'sine',.05);this.noise(.03,3000,1500,.02)},
- hover(){const n=performance.now();if(n-this.last<70||!this.ctx)return;this.last=n;this.tone(2600,2400,.025,'sine',.012)},
- nav(){this.noise(.32,300,2600,.045);this.tone(420,840,.18,'sine',.02)},
- swipe(){this.noise(.22,1800,500,.035)},
- toggle(){this.tone(880,880,.05,'triangle',.04);this.tone(1320,1320,.06,'triangle',.035,.05)},
- ok(){[660,880,1320].forEach((f,i)=>this.tone(f,f,.22,'sine',.045,i*.09))},
- err(){this.tone(220,160,.16,'square',.025);this.tone(200,140,.16,'square',.02,.12)},
- engine(){const c=this.ac();if(!c)return;const o=c.createOscillator(),o2=c.createOscillator(),f=c.createBiquadFilter(),g=c.createGain(),t0=c.currentTime;o.type='sawtooth';o2.type='square';o.frequency.setValueAtTime(38,t0);o.frequency.exponentialRampToValueAtTime(95,t0+.45);o.frequency.exponentialRampToValueAtTime(60,t0+.9);o2.frequency.setValueAtTime(19,t0);o2.frequency.exponentialRampToValueAtTime(48,t0+.45);f.type='lowpass';f.frequency.setValueAtTime(260,t0);f.frequency.linearRampToValueAtTime(700,t0+.45);f.frequency.linearRampToValueAtTime(300,t0+.9);g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(.09,t0+.08);g.gain.exponentialRampToValueAtTime(.0001,t0+1);o.connect(f);o2.connect(f);f.connect(g).connect(c.destination);o.start();o2.start();o.stop(t0+1.05);o2.stop(t0+1.05)}};
+const SFX={ctx:null,out:null,last:0,unlocked:false,
+ ac(){if(!S.sound)return null;try{if(!this.ctx){this.ctx=new (window.AudioContext||window.webkitAudioContext)();const comp=this.ctx.createDynamicsCompressor();comp.threshold.value=-18;comp.ratio.value=4;this.out=this.ctx.createGain();this.out.gain.value=1;this.out.connect(comp).connect(this.ctx.destination)}if(this.ctx.state!=='running')this.ctx.resume();return this.ctx}catch(e){return null}},
+ unlock(){const c=this.ac();if(!c||this.unlocked)return;try{const b=c.createBuffer(1,1,22050),s=c.createBufferSource();s.buffer=b;s.connect(c.destination);s.start(0);this.unlocked=true}catch(e){}},
+ tone(f1,f2,dur,type='sine',vol=.2,delay=0){const c=this.ac();if(!c)return;const o=c.createOscillator(),g=c.createGain(),t0=c.currentTime+.01+delay;o.type=type;o.frequency.setValueAtTime(f1,t0);o.frequency.exponentialRampToValueAtTime(f2,t0+dur);g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(vol,t0+.006);g.gain.exponentialRampToValueAtTime(.0001,t0+dur);o.connect(g).connect(this.out);o.start(t0);o.stop(t0+dur+.03)},
+ noise(dur,f1,f2,vol=.2){const c=this.ac();if(!c)return;const n=Math.floor(c.sampleRate*dur),b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;const s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain(),t0=c.currentTime+.01;s.buffer=b;f.type='bandpass';f.Q.value=1.4;f.frequency.setValueAtTime(f1,t0);f.frequency.exponentialRampToValueAtTime(f2,t0+dur);g.gain.setValueAtTime(vol,t0);g.gain.exponentialRampToValueAtTime(.0001,t0+dur);s.connect(f).connect(g).connect(this.out);s.start(t0)},
+ click(){this.tone(1400,700,.07,'triangle',.35);this.noise(.04,3200,1800,.15)},
+ hover(){const n=performance.now();if(n-this.last<80||!this.ctx)return;this.last=n;this.tone(2200,2000,.03,'sine',.06)},
+ nav(){this.noise(.35,500,3200,.3);this.tone(500,1000,.2,'triangle',.15)},
+ swipe(){this.noise(.25,2400,700,.25)},
+ toggle(){this.tone(880,880,.07,'triangle',.3);this.tone(1320,1320,.08,'triangle',.25,.06)},
+ ok(){[660,880,1320].forEach((f,i)=>this.tone(f,f,.25,'triangle',.3,i*.1))},
+ err(){this.tone(320,220,.18,'square',.12);this.tone(280,190,.18,'square',.1,.13)},
+ engine(){const c=this.ac();if(!c)return;const t0=c.currentTime+.01,g=c.createGain(),f=c.createBiquadFilter();f.type='lowpass';f.frequency.setValueAtTime(900,t0);f.frequency.linearRampToValueAtTime(2200,t0+.45);f.frequency.linearRampToValueAtTime(800,t0+1);
+  g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(.32,t0+.08);g.gain.setValueAtTime(.32,t0+.5);g.gain.exponentialRampToValueAtTime(.0001,t0+1.05);f.connect(g).connect(this.out);
+  [[1,'sawtooth',.6],[2,'square',.25],[3,'sawtooth',.2]].forEach(([m,type,v])=>{const o=c.createOscillator(),og=c.createGain();o.type=type;o.frequency.setValueAtTime(70*m,t0);o.frequency.exponentialRampToValueAtTime(180*m,t0+.45);o.frequency.exponentialRampToValueAtTime(110*m,t0+1);og.gain.value=v;o.connect(og).connect(f);o.start(t0);o.stop(t0+1.1)});
+  this.noise(.5,800,2500,.12)}};
+['touchstart','pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,()=>SFX.unlock(),{passive:true,capture:true}));
 
 /* ======= ICONS ======= */
 const IC={seat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 4v9a2 2 0 0 0 2 2h7l2 5M7 13h9"/><path d="M9 20h8"/></svg>',
